@@ -1,11 +1,11 @@
 Name:                alex-meta
-Version:             0.3.0.9
+Version:             0.3.0.10
 Synopsis:            Quasi-quoter for Alex lexers
 -- Description:         
 License:             BSD3
 License-file:        LICENSE
 Author:              Jonas Duregard
-Maintainer:          jonas.duregard@gmail.com
+Maintainer:          artem.pelenitsyn@gmail.com
 Category:            Development
 Build-type:          Simple
 Description:         A Template-Haskell based version of the Alex lexer generator. It is used by BNFC-meta to generate lexers and currently this is the only feature known to be working.
@@ -53,7 +53,6 @@ Library
         Data.Ranged.Boundaries
         Data.Ranged.RangedSet
         Data.Ranged.Ranges
-
 
 source-repository head
   type: git
