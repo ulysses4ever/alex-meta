@@ -53,3 +53,8 @@ Library
         Data.Ranged.Boundaries
         Data.Ranged.RangedSet
         Data.Ranged.Ranges
+
+
+source-repository head
+  type: git
+  location: http://github.com/ulysses4ever/alex-meta.git
