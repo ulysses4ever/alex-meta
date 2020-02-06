@@ -43,13 +43,13 @@ parseScript :: Maybe FilePath -> String
 parseScript maybeFile prg =
   let file = maybe "<no file>" id maybeFile in
   case runP prg initialParserEnv parse of
-	Left (Just (AlexPn _ line col),err) -> 
-		error (file ++ ":" ++ show line ++ ":" ++ show col
-				 ++ ": " ++ err ++ "\n")
-	Left (Nothing, err) ->
-		error (file ++ ": " ++ err ++ "\n")
+        Left (Just (AlexPn _ line col),err) -> 
+                error (file ++ ":" ++ show line ++ ":" ++ show col
+                                 ++ ": " ++ err ++ "\n")
+        Left (Nothing, err) ->
+                error (file ++ ": " ++ err ++ "\n")
 
-	Right script -> script
+        Right script -> script
 
 
 
@@ -60,7 +60,7 @@ alex cli script =
   let 
     target = if OptGhcTarget `elem` cli then GhcTarget else HaskellTarget
     encoding
-      | OptLatin1 `elem` cli = Latin1	
+      | OptLatin1 `elem` cli = Latin1   
       | otherwise            = UTF8
     (maybe_header, directives, scanner1, maybe_footer) = script
     (scanner2, scs, sc_hdr) = encodeStartCodes scanner1
@@ -81,11 +81,11 @@ optsToInject _         _ = "{-# OPTIONS -cpp #-}\n"
 importsToInject :: Target -> [CLIFlags] -> String
 importsToInject _ cli = always_imports ++ debug_imports ++ glaexts_import
   where
-	glaexts_import | OptGhcTarget `elem` cli    = import_glaexts
-		       | otherwise                  = ""
+        glaexts_import | OptGhcTarget `elem` cli    = import_glaexts
+                       | otherwise                  = ""
 
-	debug_imports  | OptDebugParser `elem` cli = import_debug
-		       | otherwise		   = ""
+        debug_imports  | OptDebugParser `elem` cli = import_debug
+                       | otherwise                 = ""
 
 -- CPP is turned on for -fglasogw-exts, so we can use conditional
 -- compilation.  We need to #include "config.h" to get hold of
@@ -93,44 +93,44 @@ importsToInject _ cli = always_imports ++ debug_imports ++ glaexts_import
 
 always_imports :: String
 always_imports = "#if __GLASGOW_HASKELL__ >= 603\n" ++
-		 "#include \"ghcconfig.h\"\n" ++
-		 "#elif defined(__GLASGOW_HASKELL__)\n" ++
-		 "#include \"config.h\"\n" ++
-		 "#endif\n" ++
-		 "#if __GLASGOW_HASKELL__ >= 503\n" ++
-		 "import Data.Array\n" ++
-		 "import Data.Char (ord)\n" ++
-		 "import Data.Array.Base (unsafeAt)\n" ++
-		 "#else\n" ++
-		 "import Array\n" ++
-		 "import Char (ord)\n" ++
-		 "#endif\n"
+                 "#include \"ghcconfig.h\"\n" ++
+                 "#elif defined(__GLASGOW_HASKELL__)\n" ++
+                 "#include \"config.h\"\n" ++
+                 "#endif\n" ++
+                 "#if __GLASGOW_HASKELL__ >= 503\n" ++
+                 "import Data.Array\n" ++
+                 "import Data.Char (ord)\n" ++
+                 "import Data.Array.Base (unsafeAt)\n" ++
+                 "#else\n" ++
+                 "import Array\n" ++
+                 "import Char (ord)\n" ++
+                 "#endif\n"
 
 import_glaexts :: String
 import_glaexts = "#if __GLASGOW_HASKELL__ >= 503\n" ++
-		 "import GHC.Exts\n" ++
-		 "#else\n" ++
-		 "import GlaExts\n" ++
-		 "#endif\n"
+                 "import GHC.Exts\n" ++
+                 "#else\n" ++
+                 "import GlaExts\n" ++
+                 "#endif\n"
 
 import_debug :: String 
 import_debug   = "#if __GLASGOW_HASKELL__ >= 503\n" ++
-		 "import System.IO\n" ++
-		 "import System.IO.Unsafe\n" ++
-		 "import Debug.Trace\n" ++
-		 "#else\n" ++
-		 "import IO\n" ++
-		 "import IOExts\n" ++
-		 "#endif\n"
+                 "import System.IO\n" ++
+                 "import System.IO.Unsafe\n" ++
+                 "import Debug.Trace\n" ++
+                 "#else\n" ++
+                 "import IO\n" ++
+                 "import IOExts\n" ++
+                 "#endif\n"
 
 initialParserEnv :: (Map String CharSet, Map String RExp)
 initialParserEnv = (initSetEnv, initREEnv)
 
 initSetEnv :: Map String CharSet
 initSetEnv = Map.fromList [("white", charSet " \t\n\v\f\r"),
-		           ("printable", charSetRange (chr 32) (chr 0x10FFFF)), -- FIXME: Look it up the unicode standard
-		           (".", charSetComplement emptyCharSet 
-			    `charSetMinus` charSetSingleton '\n')]
+                           ("printable", charSetRange (chr 32) (chr 0x10FFFF)), -- FIXME: Look it up the unicode standard
+                           (".", charSetComplement emptyCharSet 
+                            `charSetMinus` charSetSingleton '\n')]
 
 initREEnv :: Map String RExp
 initREEnv = Map.empty

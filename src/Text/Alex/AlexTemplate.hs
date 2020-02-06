@@ -56,8 +56,8 @@ alexIndexInt32OffAddr (AlexA# arr) off =  |] ++
     narrow32Int# i
     where
        !i    = word2Int# ((b3 `uncheckedShiftL#` 24#) `or#`
-		     (b2 `uncheckedShiftL#` 16#) `or#`
-		     (b1 `uncheckedShiftL#` 8#) `or#` b0)
+                     (b2 `uncheckedShiftL#` 16#) `or#`
+                     (b1 `uncheckedShiftL#` 8#) `or#` b0)
        !b3   = int2Word# (ord# (indexCharOffAddr# arr (off' +# 3#)))
        !b2   = int2Word# (ord# (indexCharOffAddr# arr (off' +# 2#)))
        !b1   = int2Word# (ord# (indexCharOffAddr# arr (off' +# 1#)))
@@ -100,30 +100,30 @@ alexScan input (I# (sc))
 
 alexScanUser user input (I# (sc))
   = case alex_scan_tkn user input 0# input sc AlexNone of
-	(AlexNone, input') ->
-		case alexGetByte input of
-			Nothing -> 
+        (AlexNone, input') ->
+                case alexGetByte input of
+                        Nothing -> 
 
 
 
-				   AlexEOF
-			Just _ ->
+                                   AlexEOF
+                        Just _ ->
 
 
 
-				   AlexError input'
+                                   AlexError input'
 
-	(AlexLastSkip input'' len, _) ->
-
-
-
-		AlexSkip input'' len
-
-	(AlexLastAcc k input''' len, _) ->
+        (AlexLastSkip input'' len, _) ->
 
 
 
-		AlexToken input''' len k
+                AlexSkip input'' len
+
+        (AlexLastAcc k input''' len, _) ->
+
+
+
+                AlexToken input''' len k
 
 
 -- Push the input through the DFA, remembering the most recent accepting
@@ -132,7 +132,7 @@ alexScanUser user input (I# (sc))
 alex_scan_tkn user orig_input len input s last_acc =
   input `seq` -- strict in the input
   let 
-	new_acc = (check_accs (alex_accept `quickIndex` (I# (s))))
+        new_acc = (check_accs (alex_accept `quickIndex` (I# (s))))
   in
   new_acc `seq`
   case alexGetByte input of
@@ -141,35 +141,35 @@ alex_scan_tkn user orig_input len input s last_acc =
 
 
 
-	let
-		(base) = alexIndexInt32OffAddr alex_base s
-		((I# (ord_c))) = fromIntegral c
-		(offset) = (base +# ord_c)
-		(check)  = alexIndexInt16OffAddr alex_check offset
-		
-		(new_s) = if (offset >=# 0#) && (check ==# ord_c)
-			  then alexIndexInt16OffAddr alex_table offset
-			  else alexIndexInt16OffAddr alex_deflt s
-	in
-	case new_s of 
-	    -1# -> (new_acc, input)
-		-- on an error, we want to keep the input *before* the
-		-- character that failed, not after.
-    	    _ -> alex_scan_tkn user orig_input (if c < 0x80 || c >= 0xC0 then (len +# 1#) else len)
+        let
+                (base) = alexIndexInt32OffAddr alex_base s
+                ((I# (ord_c))) = fromIntegral c
+                (offset) = (base +# ord_c)
+                (check)  = alexIndexInt16OffAddr alex_check offset
+                
+                (new_s) = if (offset >=# 0#) && (check ==# ord_c)
+                          then alexIndexInt16OffAddr alex_table offset
+                          else alexIndexInt16OffAddr alex_deflt s
+        in
+        case new_s of 
+            -1# -> (new_acc, input)
+                -- on an error, we want to keep the input *before* the
+                -- character that failed, not after.
+            _ -> alex_scan_tkn user orig_input (if c < 0x80 || c >= 0xC0 then (len +# 1#) else len)
                                                 -- note that the length is increased ONLY if this is the 1st byte in a char encoding)
-			new_input new_s new_acc
+                        new_input new_s new_acc
 
   where
-	check_accs [] = last_acc
-	check_accs (AlexAcc a : _) = AlexLastAcc a input (I# (len))
-	check_accs (AlexAccSkip : _)  = AlexLastSkip  input (I# (len))
-	check_accs (AlexAccPred a predx : rest)
-	   | predx user orig_input (I# (len)) input
-	   = AlexLastAcc a input (I# (len))
-	check_accs (AlexAccSkipPred predx : rest)
-	   | predx user orig_input (I# (len)) input
-	   = AlexLastSkip input (I# (len))
-	check_accs (_ : rest) = check_accs rest
+        check_accs [] = last_acc
+        check_accs (AlexAcc a : _) = AlexLastAcc a input (I# (len))
+        check_accs (AlexAccSkip : _)  = AlexLastSkip  input (I# (len))
+        check_accs (AlexAccPred a predx : rest)
+           | predx user orig_input (I# (len)) input
+           = AlexLastAcc a input (I# (len))
+        check_accs (AlexAccSkipPred predx : rest)
+           | predx user orig_input (I# (len)) input
+           = AlexLastSkip input (I# (len))
+        check_accs (_ : rest) = check_accs rest
 
 data AlexLastAcc a
   = AlexNone
@@ -206,11 +206,11 @@ alexPrevCharIsOneOf arr _ input _ _ = arr ! alexInputPrevChar input
 --alexRightContext :: Int -> AlexAccPred _
 alexRightContext (I# (sc)) user _ _ input = 
      case alex_scan_tkn user input 0# input sc AlexNone of
-	  (AlexNone, _) -> False
-	  _ -> True
-	-- TODO: there's no need to find the longest
-	-- match when checking the right context, just
-	-- the first match will do.
+          (AlexNone, _) -> False
+          _ -> True
+        -- TODO: there's no need to find the longest
+        -- match when checking the right context, just
+        -- the first match will do.
 
 -- used by wrappers
 iUnbox (I# (i)) = i

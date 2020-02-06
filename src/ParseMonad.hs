@@ -7,11 +7,11 @@
 -- ----------------------------------------------------------------------------}
 
 module ParseMonad (
-  	AlexInput, alexInputPrevChar, alexGetChar, alexGetByte,
-  	AlexPosn(..), alexStartPos,
+        AlexInput, alexInputPrevChar, alexGetChar, alexGetByte,
+        AlexPosn(..), alexStartPos,
  
-	P, runP, StartCode, failP, lookupSMac, lookupRMac, newSMac, newRMac,
-	setStartCode, getStartCode, getInput, setInput,
+        P, runP, StartCode, failP, lookupSMac, lookupRMac, newSMac, newRMac,
+        setStartCode, getStartCode, getInput, setInput,
  ) where
 
 import AbsSyn hiding ( StartCode )
@@ -28,10 +28,10 @@ import Control.Applicative ( Applicative(..) )
 
 type Byte = Word8
 
-type AlexInput = (AlexPosn, 	-- current position,
-		  Char,		-- previous char
+type AlexInput = (AlexPosn,     -- current position,
+                  Char,         -- previous char
                   [Byte],
-		  String)	-- current input string
+                  String)       -- current input string
 
 alexInputPrevChar :: AlexInput -> Char
 alexInputPrevChar (_,c,_,_) = c
@@ -40,7 +40,7 @@ alexInputPrevChar (_,c,_,_) = c
 alexGetChar :: AlexInput -> Maybe (Char,AlexInput)
 alexGetChar (_,_,[],[]) = Nothing
 alexGetChar (p,_,[],(c:s))  = let p' = alexMove p c in p' `seq`
-				Just (c, (p', c, [], s))
+                                Just (c, (p', c, [], s))
 
 alexGetByte :: AlexInput -> Maybe (Byte,AlexInput)
 alexGetByte (p,c,(b:bs),s) = Just (b,(p,c,bs,s))
@@ -60,7 +60,7 @@ alexGetByte (p,_,[],(c:s))  = let p' = alexMove p c
 -- assuming the usual eight character tab stops.
 
 data AlexPosn = AlexPn !Int !Int !Int
-	deriving (Eq,Show)
+        deriving (Eq,Show)
 
 alexStartPos :: AlexPosn
 alexStartPos = AlexPn 0 1 1
@@ -77,29 +77,29 @@ type ParseError = (Maybe AlexPosn, String)
 type StartCode = Int
 
 data PState = PState {
-		smac_env  :: Map String CharSet,
-		rmac_env  :: Map String RExp,
-		startcode :: Int,
-		input     :: AlexInput
-	     }
+                smac_env  :: Map String CharSet,
+                rmac_env  :: Map String RExp,
+                startcode :: Int,
+                input     :: AlexInput
+             }
 
 newtype P a = P { unP :: PState -> Either ParseError (PState,a) }
 
 instance Monad P where
  (P m) >>= k = P $ \env -> case m env of
-			Left err -> Left err
-			Right (env',ok) -> unP (k ok) env'
+                        Left err -> Left err
+                        Right (env',ok) -> unP (k ok) env'
  return a = P $ \env -> Right (env,a)
 
 runP :: String -> (Map String CharSet, Map String RExp) 
-	-> P a -> Either ParseError a
+        -> P a -> Either ParseError a
 runP str (senv,renv) (P p) 
   = case p initial_state of
-	Left err -> Left err
-	Right (_,a) -> Right a
+        Left err -> Left err
+        Right (_,a) -> Right a
  where initial_state = 
- 	  PState{ smac_env=senv, rmac_env=renv,
-	     startcode = 0, input=(alexStartPos,'\n',[],str) }
+          PState{ smac_env=senv, rmac_env=renv,
+             startcode = 0, input=(alexStartPos,'\n',[],str) }
 
 instance Functor P where
   fmap f a = a >>= (return . f)
@@ -119,15 +119,15 @@ lookupSMac :: (AlexPosn,String) -> P CharSet
 lookupSMac (posn,smac)
  = P $ \s@PState{ smac_env = senv } -> 
        case Map.lookup smac senv of
-	Just ok -> Right (s,ok)
-	Nothing -> Left (Just posn, "unknown set macro: $" ++ smac)
+        Just ok -> Right (s,ok)
+        Nothing -> Left (Just posn, "unknown set macro: $" ++ smac)
 
 lookupRMac :: String -> P RExp
 lookupRMac rmac 
  = P $ \s@PState{ rmac_env = renv } -> 
        case Map.lookup rmac renv of
-	Just ok -> Right (s,ok)
-	Nothing -> Left (Nothing, "unknown regex macro: %" ++ rmac)
+        Just ok -> Right (s,ok)
+        Nothing -> Left (Nothing, "unknown regex macro: %" ++ rmac)
 
 newSMac :: String -> CharSet -> P ()
 newSMac smac set 
