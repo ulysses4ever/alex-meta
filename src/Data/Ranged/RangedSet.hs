@@ -72,8 +72,10 @@ infixl 5 -<=-, -<-, -?-
 newtype RSet v = RSet {rSetRanges :: [Range v]}
    deriving (Eq, Show, Ord)
 
+instance DiscreteOrdered a => Semigroup (RSet a) where
+    (<>) = rSetUnion
+
 instance DiscreteOrdered a => Monoid (RSet a) where
-    mappend = rSetUnion
     mempty = rSetEmpty
 
 -- | Determine if the ranges in the list are both in order and non-overlapping.
