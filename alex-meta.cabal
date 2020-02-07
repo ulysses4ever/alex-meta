@@ -1,5 +1,5 @@
 Name:                alex-meta
-Version:             0.3.0.10
+Version:             0.3.0.11
 Synopsis:            Quasi-quoter for Alex lexers
 -- Description:         
 License:             BSD3
@@ -28,6 +28,8 @@ Library
     , base >= 4.2 && < 5
     , array, containers
     , QuickCheck >=2
+  if !impl(ghc >= 8.0)
+    Build-depends: semigroups == 0.19.*
 
   Build-tools: alex, happy
   
