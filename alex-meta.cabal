@@ -1,5 +1,5 @@
 Name:                alex-meta
-Version:             0.3.0.11
+Version:             0.3.0.12
 Synopsis:            Quasi-quoter for Alex lexers
 -- Description:         
 License:             BSD3
@@ -9,13 +9,15 @@ Maintainer:          artem.pelenitsyn@gmail.com
 Category:            Development
 Build-type:          Simple
 Description:         A Template-Haskell based version of the Alex lexer generator. It is used by BNFC-meta to generate lexers and currently this is the only feature known to be working.
-Cabal-version:       >=1.8
+Cabal-version:       >=1.10
+Extra-Source-Files:  changelog.md
 
 
 Library
+  default-language: Haskell98
   hs-source-dirs: src .
 
-  extensions: CPP
+  default-extensions: CPP
 
   Exposed-modules:     
     Text.Alex.Quote
@@ -23,7 +25,7 @@ Library
   
   -- Packages needed in order to build this package.
   Build-depends:
-      template-haskell >=2.5&&<2.16
+      template-haskell >=2.5&&<2.17
     , haskell-src-meta >=0.5.1.2&&<1.0
     , base >= 4.2 && < 5
     , array, containers
